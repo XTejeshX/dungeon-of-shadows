@@ -1,6 +1,5 @@
 # this file will contain about the code of items pickup and usage etc
 # Each item has an name description and effect.
-import player as p
 
 ITEMS = {
     "torch": {
@@ -42,50 +41,39 @@ def pick_up_item(player, room):
     """
 
     # 1. CHECK FOR ITEM PRESENCE
-    # We look inside the 'room' dictionary for the value associated with the "item" key.
-    item_key = room.get("item")
 
-    # If item_key is None or empty, the room is empty. 
-    # We print a message and 'return' early to stop the rest of the function from running.
-    if not item_key:
+    if not room.item:
         print("There is nothing in this room to loot.")
         return
 
     # 2. RETRIEVE ITEM DATA
     # We use the key (like "iron_sword") to look up the full item details 
     # from a global ITEMS dictionary.
-    item = ITEMS[item_key]
-    effect = item["effect"]
+    item = ITEMS[room.item]
+    
 
     # Provide immediate feedback to the player about what they found.
     print(f"You have picked up {item['name']}")
     print(f"    {item['description']}")
 
+
     # 3. HANDLE DIFFERENT ITEM EFFECTS
-    
+    effect = item["effect"]
     # CASE A: THE ITEM IS GOLD
     if effect == "gold":
         # Add the item's value directly to the player's currency balance.
-        player["gold"] += item["value"]
-        print(f"    💰+{item['value']} gold!, the player now has a total of {player['gold']}")
+        player.gold += item["value"]
+        print(f"    💰+{item['value']} gold!, the player now has a total of {player.gold}")
     
     # CASE B: THE ITEM IS A WEAPON (ATTACK BOOST)
     elif effect == "attack_boost":
-        # Compare the new weapon's value against the currently equipped bonus.
-        # .get("weapon_bonus", 0) handles cases where the player is unarmed (starting at 0).
-        if item["value"] > player.get("weapon_bonus", 0):
-            # Save the current attack so we can show the change in the print statement.
-            old_attack = player["attack"]
+        if item["value"] > player.weapon_bonus:
+            gain = item["value"] - player.weapon_bonus
+            player.attack += gain          
+            player.weapon_bonus = item["value"]  
+            player.weapon = item["name"]         
             
-            # Calculate the difference (delta). 
-            # If current bonus is 2 and new is 5, we only add 3 to the total attack.
-            bonus_gain = item["value"] - player.get("weapon_bonus", 0)
-            
-            player["attack"] += bonus_gain          # Update total combat power
-            player["weapon_bonus"] = item["value"]  # Set the new 'benchmark' for gear
-            player["weapon"] = item["name"]         # Update the name of equipped gear
-            
-            print(f" ⚔️  Equipped attack: {old_attack} -> {player['attack']}")
+            print(f" ⚔️  Equipped attack:  {player.attack}")
         else:
             # If the item is weaker, we don't change stats; the player just leaves it.
             print("You already have a better weapon")
@@ -94,18 +82,18 @@ def pick_up_item(player, room):
     elif effect == "heal":
         # Potions are not used immediately; they are added to the 'inventory' list.
         # This allows the player to use them later during combat or exploration.
-        player["inventory"].append(item_key)
+        player.inventory.append(room.item)
         print(" Added the item into the bag. Use it from the inventory menu")
     
     # CASE D: THE ITEM IS A QUEST ITEM OR MISC (NONE)
     elif effect == "none":
         # Items with no direct stat effect are simply moved to the player's inventory.
-        player["inventory"].append(item_key)
+        player.inventory.append(room.item)
 
     # 4. CLEANUP
     # After the player interacts with the item (picks it up or equips it), 
     # we set the room's item to None so they can't loot the same room twice.
-    room["item"] = None
+    room.item = None
 
 
 
@@ -113,27 +101,26 @@ def show_inventory(player):
     # displays users inventory
 
     print("---------------PLAYER INVENTORY---------------------")
-    print(f" Weapon  : {player.get('weapon', 'bare hands')}")
-    print(f" Gold    : {player['gold']}")
+    print(f" Weapon  : {player.weapon}")
+    print(f" Gold    : {player.gold}")
     
-    bag = player["inventory"]
+    #bag = player.inventory
 
-    if not bag:
+    if not player.inventory:
         print("     BAG : (EMPTY)")
     else:
         print("     BAG:")
-        for i, item_key in enumerate(bag):
+        for i, item_key in enumerate(player.inventory):
             item = ITEMS[item_key]
-            print(f"     [{i}] {item['name']} - {item['description']}")
+            print(f"     [{i+1}] {item['name']} - {item['description']}")
     
 
 
 def use_item(player):
     # it lets the player use an item from the inventory if available, returns true if item was used, False otherwise.
 
-    bag = player["inventory"]
 
-    usable = [(i, k) for i, k in enumerate(bag) if ITEMS[k]["effect"] == "heal"]
+    usable = [(i, k) for i, k in enumerate(player.inventory) if ITEMS[k]["effect"] == "heal"]
 
     if not usable:
         print("\n There is no usable item in your bag.")
@@ -143,7 +130,7 @@ def use_item(player):
     print("\n Which item would you like to use?")
     for i, key in usable:
         item = ITEMS[key]
-        print(f"    [{i + 1}] {item['name']}")
+        print(f"    [{i + 1}] {ITEMS[key]['name']}")
 
     choice = input(" Enter number (or 0 to cancel):").strip()
 
@@ -152,12 +139,12 @@ def use_item(player):
     
     try:
         index = int(choice) - 1
-        item_key = bag[index]
+        item_key = player.inventory[index]
         item = ITEMS[item_key]
 
         if item["effect"] == "heal":
-            p.heal_player(player, item["value"])
-            bag.pop(index)
+            player.heal(item["value"])
+            player.inventory.pop(index)
             return True
 
     except (ValueError, IndexError):

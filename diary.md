@@ -63,3 +63,8 @@
 
 **April 27, 2026**
 * total refactoring into oop concepts currently enemy.py and player.py files are completed.
+
+
+**May 01, 2026**
+* files of combat.py, inventory.py, rooms.py have been modified to accomodate the new OOP structure 
+* further changes need to be done in the main.py file, save.py file
