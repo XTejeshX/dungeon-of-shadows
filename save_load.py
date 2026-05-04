@@ -2,15 +2,20 @@
 
 import json
 import os
+from player import Player
 
 SAVE_FILE = "savegame.json"
 
-def save_game(player, current_room_key):
-    # save the currnt game situation into a JSON file, writes the player data , current room in to savegame.json
-    
+def save_game(player, current_room_key, dungeon):
+    # saves the player object + dungeon room states to JSON.
+    # dungeon is the {key : Room} dict so we capture visited/item state.
+
+    room_states = {key: room.to_dict() for key, room in dungeon.items()} 
+        
     save_data = {
-        "player" : player,
-        "current_room" : current_room_key
+        "player"        : player.to_dict(),
+        "current_room"  : current_room_key,
+        "room_states"   : room_states,
     }
 
     try:
@@ -20,8 +25,9 @@ def save_game(player, current_room_key):
     except IOError as e:
         print(f"\n could not save game :{e}")
 
-def load_game():
-    #loads game state from the JSON save file, returns (player, current_room_key) or (None, None) if no save exists.
+def load_game(dungeon):
+    #loads game state from the JSON save file, returns (player object, room_key) or (None, None) if no save exists.
+    #also returns visited/items state for each room in the dungeon
     if not os.path.exists(SAVE_FILE):
         print("\n No Save file found")
         return None, None
@@ -30,11 +36,18 @@ def load_game():
         with open(SAVE_FILE,"r") as f:
             save_data = json.load(f)
 
-            player = save_data["player"]
-            current_room_key = save_data["current_room"]
+            # rebuild Player from saved dict using the @classmethod
+            player = Player.from_dict(save_data["Player"])
+            current_room = save_data["current_room"]
+
+
+            for key, state in save_data.get("room_states", {}).items():
+                if key in dungeon:
+                    dungeon[key].visited = state.get("visited", False)
+                    dungeon[key].item    = state.get("item", dungeon[key].item)
 
             print(f"\n Game Loaded! Welcome back {player['name']}!")
-            return player, current_room_key
+            return player, current_room
         
     except (json.JSONDecodeError, KeyError) as e:
         print(f" Save file is corrupted: {e}")

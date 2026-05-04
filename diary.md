@@ -68,3 +68,8 @@
 **May 01, 2026**
 * files of combat.py, inventory.py, rooms.py have been modified to accomodate the new OOP structure 
 * further changes need to be done in the main.py file, save.py file
+
+
+**May 04, 2026**
+* files for save_load.py and main.py have been modified for OOP concepts
+* there are some unintentional bugs(game ending after beating a room enemy) which will be fixed later 
