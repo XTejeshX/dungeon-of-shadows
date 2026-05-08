@@ -1,6 +1,9 @@
 # this file will contain about the code of items pickup and usage etc
 # Each item has an name description and effect.
 
+import player
+
+
 ITEMS = {
     "torch": {
         "name": "Torch",
@@ -121,33 +124,28 @@ def use_item(player):
 
 
     usable = [(i, k) for i, k in enumerate(player.inventory) if ITEMS[k]["effect"] == "heal"]
-
     if not usable:
         print("\n There is no usable item in your bag.")
         return False
     
 
     print("\n Which item would you like to use?")
-    for i, key in usable:
-        item = ITEMS[key]
-        print(f"    [{i + 1}] {ITEMS[key]['name']}")
+    for display_num, (inv_index, key) in enumerate(usable, start=1):
+        print(f"    [{display_num}] {ITEMS[key]['name']}")
 
     choice = input(" Enter number (or 0 to cancel):").strip()
 
-    if int(choice) == 0:
-        return False
+    
     
     try:
-        index = int(choice) - 1
-        item_key = player.inventory[index]
-        item = ITEMS[item_key]
-
-        if item["effect"] == "heal":
-            player.heal(item["value"])
-            player.inventory.pop(index)
-            return True
-
+        if int(choice) == 0:
+            return False
+        
+        inv_index, item_key = usable[int(choice) - 1]   # ✅ correct index
+        player.heal(ITEMS[item_key]["value"])
+        player.inventory.pop(inv_index)
+        return True
     except (ValueError, IndexError):
-        print(" Invalid choice! Please enter a valid one.")
+        print("  Invalid choice.")
     
     return False

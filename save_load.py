@@ -24,7 +24,7 @@ def save_game(player, current_room_key, dungeon):
     try:
         with open(SAVE_FILE, "w") as f:
             json.dump(save_data, f, indent= 4)
-            print(f"\n GAME SAVED! ({SAVE_FILE})")
+        print(f"\n GAME SAVED! ({SAVE_FILE})")
     except IOError as e:
         print(f"\n could not save game :{e}")
 

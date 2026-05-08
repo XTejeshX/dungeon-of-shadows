@@ -47,7 +47,7 @@ class Player:
         self.attack     += 5
         self.hp         = self.max_hp
         print(f"player has leveled up {self.level}")
-        print(f"attack improved to :{self.attack} and attack increased to {self.attack}")
+        print(f"  Max HP increased to: {self.max_hp}  |  Attack increased to: {self.attack}")
 
     def show_stats(self):
         # shows player stats

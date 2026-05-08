@@ -42,7 +42,7 @@ class Room:
 
 
 def build_dungeon():
-# a dictionary of room objects keyed by a short string id
+    # a dictionary of room objects keyed by a short string id
     return {
         "entrance": Room(
             name        ="Dungeon Entrance",

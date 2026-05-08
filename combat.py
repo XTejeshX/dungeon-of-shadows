@@ -61,7 +61,7 @@ def run_combat(player, enemy):
                 return "flee"
             else:
                 print("\n You have failed to escape!")
-                enemy_dmg = enemy.enemy_attack()
+                enemy_dmg = enemy.roll_attack()
                 player.take_damage(enemy_dmg)
                 print(f"\n 😈 {enemy.name} hits you for a damage {enemy_dmg}! while fleeing")
 
