@@ -73,3 +73,8 @@
 **May 04, 2026**
 * files for save_load.py and main.py have been modified for OOP concepts
 * there are some unintentional bugs(game ending after beating a room enemy) which will be fixed later 
+
+**May 08, 2026**
+* Some bugs which were known in the previous commits were identified and rectified such as the main file bug which is causing the game to return as soon as defeating the room enemy.
+* When using the inventory item a bug has been identified which was causing to use the item which was not intended to use, fixed in the inventory.py file.
+* Loading the save file was causing an bug where it was not loading properly, it has been fixed in the save_load.py file

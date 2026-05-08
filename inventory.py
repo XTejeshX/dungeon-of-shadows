@@ -134,7 +134,7 @@ def use_item(player):
 
     choice = input(" Enter number (or 0 to cancel):").strip()
 
-    if choice == 0:
+    if int(choice) == 0:
         return False
     
     try:

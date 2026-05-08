@@ -4,7 +4,10 @@ import json
 import os
 from player import Player
 
-SAVE_FILE = "savegame.json"
+
+
+_GAME_DIR = os.path.dirname(os.path.abspath(__file__))
+SAVE_FILE = os.path.join(_GAME_DIR, "savegame.json")
 
 def save_game(player, current_room_key, dungeon):
     # saves the player object + dungeon room states to JSON.
@@ -25,33 +28,73 @@ def save_game(player, current_room_key, dungeon):
     except IOError as e:
         print(f"\n could not save game :{e}")
 
+def _extract_player_dict(data):
+    """
+    Tries to find the player dict from the loaded JSON.
+    Handles multiple formats:
+      - Phase 4:  {"player": {...}, "current_room": ..., "room_states": ...}
+      - Phase 3:  {"player": {...}, "current_room": ...}  (no room_states)
+      - Old/bad:  {"Player": {...}, ...}  (capital P)
+      - Flat:     {"name": ..., "hp": ...}  (player IS the top level)
+    """
+
+    if "player" in data:
+        return data["player"]
+    
+    if "Player" in data:
+        return data["Player"]
+    
+    if "name" in data and "hp" in data and "level" in data:
+        return data
+    
+    return None
+
+
 def load_game(dungeon):
-    #loads game state from the JSON save file, returns (player object, room_key) or (None, None) if no save exists.
-    #also returns visited/items state for each room in the dungeon
     if not os.path.exists(SAVE_FILE):
         print("\n No Save file found")
         return None, None
     
     try:
-        with open(SAVE_FILE,"r") as f:
-            save_data = json.load(f)
-
-            # rebuild Player from saved dict using the @classmethod
-            player = Player.from_dict(save_data["Player"])
-            current_room = save_data["current_room"]
-
-
-            for key, state in save_data.get("room_states", {}).items():
-                if key in dungeon:
-                    dungeon[key].visited = state.get("visited", False)
-                    dungeon[key].item    = state.get("item", dungeon[key].item)
-
-            print(f"\n Game Loaded! Welcome back {player['name']}!")
-            return player, current_room
-        
-    except (json.JSONDecodeError, KeyError) as e:
-        print(f" Save file is corrupted: {e}")
+        with open(SAVE_FILE, "r") as f:
+            data = json.load(f)
+    except json.JSONDecodeError as e:
+        print(f"\n Save file not valid JSON: {e}")
         return None, None
+    
+    player_data = _extract_player_dict(data)
+
+    if player_data is None:
+        print("\n  ❌ Save file has an unexpected format.")
+        return None, None
+    
+    # FIX: Use lowercase 'player_obj' to avoid overwriting the 'Player' class
+    try:
+        player_obj = Player.from_dict(player_data)
+    except Exception as e:
+        print(f"\n  ❌ Player data is incomplete: {e}")
+        return None, None
+
+    # --- Get current room ---
+    current_room = data.get("current_room", "entrance")
+
+    if current_room not in dungeon:
+        print(f"\n  ⚠️  Saved room '{current_room}' not found — starting from entrance.")
+        current_room = "entrance"
+ 
+    # --- Restore room states ---
+    for key, state in data.get("room_states", {}).items():
+        if key in dungeon:
+            dungeon[key].visited = state.get("visited", False)
+            # Be careful here: if the player already picked up the item, 
+            # ensure your room.to_dict() / from_dict handles None correctly.
+            dungeon[key].item = state.get("item", dungeon[key].item)
+ 
+    # FIX: Reference the correct variable 'player_obj'
+    print(f"\n  ✅ Loaded! Welcome back, {player_obj.name}!")
+    return player_obj, current_room
+
+
 
 def delete_save():
     # Deletes the save file, it is used afther a game is completed or upon request/call
@@ -64,17 +107,17 @@ def save_exists():
     return os.path.exists(SAVE_FILE)
 
 def show_save_info():
-    # peeks into the save file and give basic info without fully loading
     if not save_exists():
         return
-    
     try:
         with open(SAVE_FILE, "r") as f:
             data = json.load(f)
-
-            p = data["player"]
-            room = data["current_room"].replace("_"," ").title()
-            print(f"\n save found: {p['name']}  |   Level {p['level']}  |   Room: {room}")
-
+        player_data = _extract_player_dict(data)
+        if player_data:
+            room = data.get("current_room", "?").replace("_", " ").title()
+            print(f"\n  📂 Save: {player_data['name']}  |  "
+                  f"Level {player_data['level']}  |  Room: {room}")
+        else:
+            print("\n  📂 Save found (unreadable format)")
     except Exception:
-        print("\n Save found and could not be previewed")
+        print("\n  📂 Save found (could not preview)")

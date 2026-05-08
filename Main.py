@@ -37,6 +37,7 @@ def game_loop(player, dungeon, start_room = "entrance"):
 
     # Main game loop with room navigation
     current_room_key = start_room
+    last_room_key = None
     
     print(f"\n welcome {player.name}! your adventure awaits You. Find the Throne room to win.")
     print("Or die trying!!")
@@ -44,31 +45,39 @@ def game_loop(player, dungeon, start_room = "entrance"):
 
     while True:
         room = dungeon[current_room_key]
-        room.show()
 
-        if random.random() < room.enemy_chance:
-            foe = spawn_enemy(player.level, is_boss=room.is_boss_room)
+        just_entered = (current_room_key != last_room_key)      #only run entry logic when we moved into a new room
 
-            if room.is_boss_room:
-                print("\n 👑 The Dungeon Boss blocks your path!")
+        if just_entered:
+            last_room_key = current_room_key
+            room.show()
 
-            result = run_combat(player, foe)
+            if random.random() < room.enemy_chance:
+                foe = spawn_enemy(player.level, is_boss=room.is_boss_room)
 
-            if result == "dead":
-                print("\n =================================================")
-                print("                ☠️  Game Over  ☠️                    ")
-                print(f" Level reached: {player.level} | Total kills: {player.kills} | Gold collected: {player.gold}")
-                print(" =================================================")
-                #sl.delete_save()
-                return
-            
-            if result == "win":
-                print("\n =================================================")
-                print("                🎉 You Win! 🎉                    ")
-                print(f" Level reached: {player.level} | Total kills: {player.kills} | Gold collected: {player.gold}")
-                print(" =================================================")
-                #sl.delete_save()
-                return
+                if room.is_boss_room:
+                    print("\n 👑 The Dungeon Boss blocks your path!")
+
+                result = run_combat(player, foe)
+
+                if result == "dead":
+                    print("\n =================================================")
+                    print("                ☠️  Game Over  ☠️                    ")
+                    print(f" Level reached: {player.level} | Total kills: {player.kills} | Gold collected: {player.gold}")
+                    print(" =================================================")
+                    sl.delete_save()
+                    return
+                
+                if room.is_boss_room and result == "win":
+                    print("\n =================================================")
+                    print("                🎉 You Win! 🎉                    ")
+                    print(f" Level reached: {player.level} | Total kills: {player.kills} | Gold collected: {player.gold}")
+                    print(" =================================================")
+                    sl.delete_save()
+                    return
+                
+                if result in ("win", "flee"):
+                    print("\n ⚔️ The dust settles. You are still in the dungeon.")
 
         # player action menu
         print("\n----------------------------------------")
