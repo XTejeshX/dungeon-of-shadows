@@ -1,17 +1,17 @@
-from player import Player
-from enemy import spawn_enemy
-from rooms import build_dungeon
-from combat import run_combat
-from inventory import pick_up_item, show_inventory, use_item
+from game.player import Player
+from game.enemy import spawn_enemy
+from game.rooms import build_dungeon
+from game.combat import run_combat
+from game.inventory import pick_up_item, show_inventory, use_item
 import random
-import save_load as sl
+import game.save_load as sl
 
 
 def show_banner():
     print("""
 ╔══════════════════════════════════════╗
 ║                                      ║
-║      ⚔️   DUNGEON OF SHADOWS  ⚔️    ║
+║      ⚔️   DUNGEON OF SHADOWS  ⚔️       ║
 ║      Text Adventure RPG  v4.0        ║
 ║                                      ║
 ╚══════════════════════════════════════╝

@@ -60,7 +60,7 @@ def build_dungeon():
         ),
         "guard_room": Room(
             name        = "Guard Room",
-            description = "An abandoned guard post. A rusty sword hangs ont the wall.",
+            description = "An abandoned guard post. A rusty sword hangs on the wall.",
             exits       = {"west": "entrance", "north": "armory"},
             item        = "rusty_sword",
             enemy_chance= 0.6,

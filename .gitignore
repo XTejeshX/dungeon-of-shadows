@@ -1,3 +1,39 @@
-# Python bytecode cache
+# .gitignore
+#
+# WHAT IS THIS FILE?
+#   Tells Git which files and folders to NEVER track or commit.
+#   Without this, you'd accidentally push save files, cache folders,
+#   and IDE settings into your GitHub repo.
+
+# ── Python cache ──────────────────────────────────────────────────
+# Python creates these automatically when it runs your code.
+# They're machine-specific and should never be committed.
 __pycache__/
-*.py[cod]
+*.py[cod]           # .pyc, .pyo, .pyd compiled bytecode files
+*.pyd
+
+# ── Game save files ───────────────────────────────────────────────
+# Personal save data shouldn't be in a public repo.
+savegame.json
+
+# ── Virtual environments ──────────────────────────────────────────
+# If someone creates a venv inside the project folder, ignore it.
+venv/
+.venv/
+env/
+
+# ── IDE / Editor settings ─────────────────────────────────────────
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ── OS-generated files ────────────────────────────────────────────
+.DS_Store           # macOS folder metadata
+Thumbs.db           # Windows thumbnail cache
+
+# ── Distribution / packaging ──────────────────────────────────────
+# If you ever package this for PyPI, ignore build artifacts.
+dist/
+build/
+*.egg-info/

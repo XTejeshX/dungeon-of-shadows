@@ -18,7 +18,9 @@
 * **Progression:** Added leveling system to `player.py` (stat scaling for HP and Attack).
 * **Mechanics:** Added a "Run Away" option in `combat.py` with a **50% success rate**.
 
+
 ---
+
 
 ### PHASE 2: World Building & Inventory
 
@@ -43,7 +45,9 @@
 **April 24, 2026**
 * **Bug Fix:** Resolved a dictionary error in `rooms.py` caused by a missing room definition.
 
+
 ---
+
 
 ### PHASE 3: Systems & Data Persistence
 
@@ -74,7 +78,15 @@
 * files for save_load.py and main.py have been modified for OOP concepts
 * there are some unintentional bugs(game ending after beating a room enemy) which will be fixed later 
 
+
 **May 08, 2026**
 * Some bugs which were known in the previous commits were identified and rectified such as the main file bug which is causing the game to return as soon as defeating the room enemy.
 * When using the inventory item a bug has been identified which was causing to use the item which was not intended to use, fixed in the inventory.py file.
 * Loading the save file was causing an bug where it was not loading properly, it has been fixed in the save_load.py file
+
+
+---
+
+### PHASE 5:
+**May 08, 2026**
+* Changed the whole structure into packages and added some new files necessary for the files to run and added few lines so the importing will happen properly

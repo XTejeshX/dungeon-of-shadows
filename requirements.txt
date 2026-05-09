@@ -1,0 +1,21 @@
+# requirements.txt
+#
+# WHAT IS THIS FILE?
+#   A plain text list of every external library your project needs.
+#   Anyone who downloads your project runs:
+#       pip install -r requirements.txt
+#   ...and gets exactly the right packages installed automatically.
+#
+# DUNGEON OF SHADOWS — DEPENDENCY LIST
+#
+# This project uses ONLY Python's standard library:
+#   - json       (built-in) — save/load game data
+#   - os         (built-in) — file path handling
+#   - random     (built-in) — combat and enemy spawning
+#
+# No external packages required for the base game.
+# If you extend the project later (e.g. add colours, a GUI, or tests),
+# add those packages below with pinned versions like:
+#
+#   colorama==0.4.6       # terminal colours on Windows
+#   pytest==8.1.0         # for running tests

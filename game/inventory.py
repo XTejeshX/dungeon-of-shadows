@@ -1,7 +1,6 @@
 # this file will contain about the code of items pickup and usage etc
 # Each item has an name description and effect.
 
-import player
 
 
 ITEMS = {
